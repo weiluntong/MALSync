@@ -1,3 +1,7 @@
+package MALSync
+import MALSync.ExternalSystems.MyAnimeList
+
 fun main(args: Array<String>) {
-    println("Hello, World!")
+    val mal: MyAnimeList = MyAnimeList()
+    println(mal.bar())
 }
