@@ -1,34 +1,43 @@
-l = [
-  "Cardcaptor Sakura",
-  "Chibi☆Devi!",
-  "Ginga Eiyuu Densetsu",
-  "Hokuto no Ken",
-  "Kagaku Ninja-tai Gatchaman",
-  "Les Misérables: Shoujo Cosette",
-  "Mobile Suit Gundam Wing",
-  "Monster Farm: Enbanseki no Himitsu",
-  "Nana",
-  "Saiki Kusuo no Ψ-nan",
-  "Shirokuma Cafe",
-  "Sousei no Onmyouji",
-  "Suite Precure♪",
-  "Uchuu Kyoudai"
-]
+const f = async () => {
+	const api = '//api.jikan.moe/v3/'
+	const data = await fetch(api + 'user/weiluntong/animelist/plantowatch')
+	.then((response) => {
+		return response.json()
+	})
+	let list = []
+	for (const element of data.anime) {
+		if (element.type == "Movie" || element.total_episodes >= 45)
+			continue
 
-f = () => {
-    let acc = [...jQuery('table > tbody > tr')]
-                .filter(a => a.childElementCount == 7 && a.firstElementChild.className != "table_header" && parseInt(a.children[4].children[0].firstElementChild.innerText.split('/')[1]) < 45)
-    acc = acc.map(x => x.children[1].innerText.split("\n")[1])
-    return acc
+		const info = await fetch(api + 'anime/' + element.mal_id)
+		.then((response) => {
+			return response.json()
+		})
+		let genres = []
+		for (const genre of info.genres)
+			genres.push(genre.name)
+		if (!romCom(genres))
+			list.push(element.title)
+		// list.push(element.title)
+	}
+	return list
+}
+
+const romCom = (genres) => {
+	const romComGenres = ['Harem', 'Romance', 'Shoujo', 'Ecchi', 'Slice of Life', 'Comedy']
+	for (const genre of romComGenres)
+		if (genres.includes(genre))
+			return true
+	return false
 }
 
 /**
  * Randomly shuffle an array
  * https://stackoverflow.com/a/2450976/1293256
- * @param  {Array} array The array to shuffle
- * @return {String}      The first item in the shuffled array
+ * @param {Array} array The array to shuffle
+ * @return {String} The first item in the shuffled array
  */
-shuffle = (array) => {
+const shuffle = (array) => {
 
 	let currentIndex = array.length;
 	let temporaryValue, randomIndex;
@@ -49,5 +58,4 @@ shuffle = (array) => {
 
 };
 
-
-shuffle(f())
+shuffle(await f())
